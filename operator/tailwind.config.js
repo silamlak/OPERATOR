@@ -5,9 +5,12 @@ export default {
     extend: {
       screens: {
         sm: "480px",
-        md: "768px",
+        mdd: "768px",
         lgg: "1276px",
         xl: "1440px",
+        zz: "842px",
+        clm: '1020',
+        xxxl: "200px",
       },
     },
   },

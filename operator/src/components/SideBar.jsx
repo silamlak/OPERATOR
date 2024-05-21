@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import { HiMenuAlt1 } from "react-icons/hi";
 import {
   Sidebar,
   Menu,
@@ -80,7 +80,7 @@ const SideBar = () => {
 
   const menuItemStyles = {
     root: {
-      fontSize: "13px",
+      fontSize: "15px",
       fontWeight: 400,
     },
     icon: {
@@ -121,8 +121,8 @@ const SideBar = () => {
   return (
     <>
       <div
+        className="sticky top-0 h-screen overflow-y-auto"
         style={{
-          height: "100%",
           direction: rtl ? "rtl" : "ltr",
         }}
       >
@@ -133,7 +133,7 @@ const SideBar = () => {
           onBreakPoint={setBroken}
           // image="https://user-images.githubusercontent.com/25878302/144499035-2911184c-76d3-4611-86e7-bc4e8ff84ff5.jpg"
           rtl={rtl}
-          breakPoint="833px"
+          breakPoint="1056px"
         >
           <div
             style={{
@@ -146,7 +146,7 @@ const SideBar = () => {
             <div rtl={rtl} style={{ marginBottom: "24px", marginTop: "16px" }}>
               Pro Slider
             </div>
-            <div style={{  marginBottom: "2px" }}>
+            <div style={{ marginBottom: "2px" }}>
               <div style={{ padding: "0 24px", marginBottom: "8px" }}>
                 <h2
                   style={{
@@ -157,7 +157,7 @@ const SideBar = () => {
                   General
                 </h2>
               </div>
-              <Menu>
+              <Menu menuItemStyles={menuItemStyles}>
                 <SubMenu
                   label="Charts"
                   icon={<AiOutlineBarChart />}
@@ -259,10 +259,10 @@ const SideBar = () => {
             </div>
           </div>
         </Sidebar>
-        <div className="my-4 w-full inline-block">
+        <div className="my-2 mx-6 fixed w-full block">
           {broken && (
             <button className="sb-button" onClick={() => setToggled(!toggled)}>
-              Toggle
+              <HiMenuAlt1 />
             </button>
           )}
         </div>
