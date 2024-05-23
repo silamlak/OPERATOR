@@ -22,3 +22,9 @@ export const busData = [
     bus_status: "on-maintenance",
   },
 ];
+
+export const options = [
+  { label: "All", value: 0 },
+  { label: "On-Service", value: 1 },
+  { label: "On-Maintenance", value: 2 },
+];

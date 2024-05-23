@@ -34,20 +34,20 @@ const SearchModal = ({ isOpen, onClose }) => {
         isOpen ? "block" : "hidden"
       }`}
     >
-      <div className="absolute inset-0 bg-gray-900 bg-opacity-50"></div>
-      <div className="absolute top-0 bg-white w-full max-w-lg mt-16 p-4 rounded-lg shadow-lg modal-content">
+      <div className="absolute inset-0 bg-gray-900 dark:bg-slate-800 dark:bg-opacity-50 bg-opacity-50"></div>
+      <div className="absolute top-0 bg-white dark:bg-slate-950 w-full max-w-lg mt-16 p-4 rounded-lg shadow-lg modal-content">
         <form onSubmit={handleSubmit}>
-          <div className="w-full border-b rounded-md focus:outline-none flex items-center">
-            <FaSearch className="text-gray-400" />
+          <div className="w-full border-b bg-white dark:bg-slate-950 rounded-md focus:outline-none flex items-center">
+            <FaSearch className="text-gray-700 dark:text-gray-300" />
             <input
               type="text"
               placeholder="Search..."
-              className="w-full px-4 py-2 border-none rounded-md focus:outline-none"
+              className="w-full px-4 py-2 border-none rounded-md focus:outline-none bg-white dark:bg-slate-950 text-gray-700 dark:text-gray-300"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <div className="w-full h-[150px] rounded-md focus:outline-none">
+          <div className="w-full h-[150px] text-gray-700 dark:text-gray-300 rounded-md focus:outline-none">
             <div className="flex items-center justify-center h-full">
               <p className="text-[15px] text-slate-400 font-serif">
                 Your search will be display here

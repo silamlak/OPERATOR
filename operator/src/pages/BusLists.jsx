@@ -1,161 +1,127 @@
-import React, { useEffect, useRef, useState } from "react";
-import BusListComponent from "../components/BusListComponent";
-import { busData } from "../service";
-import SearchBusModal from "../components/SearchBusModal";
+import React, { useEffect, useState } from "react";
+import BusListComponent from "../components/bus/BusListComponent";
+import SearchBusModal from "../components/bus/SearchBusModal";
+import SearchButtonBus from "../components/buttons/SearchButtonBus";
+import DropdownMenuBus from "../components/bus/DropdownMenuBus";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import Spinner from "../components/Spinner";
+import ReactPaginate from "react-paginate";
 
 const BusLists = () => {
-  const [buses, setBuses] = useState(busData);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [query, setQuery] = useState("");
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
-    const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
-  const openSearchModal = () => {
-    setIsSearchModalOpen(true);
-  };
+  const [buses, setBuses] = useState([]);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
 
   const closeSearchModal = () => {
-    setIsSearchModalOpen(false);
-  };
-  const handleClick = (index) => {
-    setActiveIndex(index);
+    setIsSearchModalOpen(!isSearchModalOpen);
   };
 
-  
-  const handleClear = () => {
-    setQuery("");
+  const fetchBuses = async (page) => {
+    try {
+      const res = await axios.get(
+        `http://localhost:3000/api/operator/list/bus?page=${page}`
+      );
+      setTotalPage(res.data.totalPages);
+      return res.data.data;
+    } catch (error) {
+      throw error;
+    }
   };
 
-  const handleDelete = (id) => {
-    const updatedBuses = buses.filter((bus) => bus._id !== id);
-    setBuses(updatedBuses);
-  };
+  const { data, isError, isLoading, isSuccess, error } = useQuery({
+    queryKey: ["all_bus", currentPage],
+    queryFn: () => fetchBuses(currentPage),
+    keepPreviousData: true, // Keeps the previous data while fetching new data
+    onSuccess: (data) => {
+      console.log("Fetched data: ", data);
+      setBuses(data); // Update buses state with fetched data
+    },
+  });
 
-  const handleEdit = (id) => {
-    // Handle edit logic here
-  };
-    const options = [
-      { label: "All", value: 0 },
-      { label: "On-Service", value: 1 },
-      { label: "On-Maintenance", value: 2 },
-    ];
-
-  const handleOptionClick = (index) => {
-    setActiveIndex(index);
-    setDropdownOpen(false);
-  };
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setDropdownOpen(false);
-      }
+  useEffect(() => {
+    document.body.style.overflow = isSearchModalOpen ? "hidden" : "auto";
+    return () => {
+      document.body.style.overflow = "auto";
     };
+  }, [isSearchModalOpen]);
 
-    useEffect(() => {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-      };
-    }, []);
+  // This effect ensures that the buses state is updated whenever the data changes
+  useEffect(() => {
+    if (isSuccess && data) {
+      // console.log("Data updated, setting buses state");
+      setBuses(data); // This should trigger a re-render
+    }
+  }, [isSuccess, data]);
 
+  // Log the buses state to debug the issue
+  useEffect(() => {
+    // console.log("Buses state updated: ", buses);
+  }, [buses]);
 
-     useEffect(() => {
-       document.body.style.overflow = isSearchModalOpen ? "hidden" : "auto";
-       return () => {
-         document.body.style.overflow = "auto";
-       };
-     }, [isSearchModalOpen]);
+  const handlePageClick = (selectedItem) => {
+    setCurrentPage(selectedItem.selected + 1); // Update currentPage on page change
+  };
 
   return (
-    <div className="">
+    <div>
       <header className="my-4">
-        <h1 className="text-4xl font-bold text-gray-800">Bus List</h1>
-        <p className="text-lg text-gray-600 mt-2">
+        <h1 className="text-4xl pb-4 text-gray-900 dark:text-gray-100 font-semibold">
+          Bus List
+        </h1>
+        <p className="text-lg pb-4 text-gray-700 dark:text-gray-300 mt-2 leading-[30px] tracking-wider">
           On this page, you will find a list of buses that are currently in
           service, undergoing maintenance, and more. Browse through the
           available options to find the bus that suits your needs.
         </p>
       </header>
+
       <div className="flex items-center justify-between my-6">
-        <div className="relative inline-block max-w-[250px]" ref={dropdownRef}>
-          <div>
-            <button
-              className="inline-flex justify-between items-center max-w-[200px] px-4 py-2 rounded-lg bg-gray-200 text-gray-600 focus:outline-none"
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-            >
-              <span className="whitespace-nowrap">
-                {options[activeIndex].label}
-              </span>
-              <svg
-                className={`ml-2 w-5 h-5 transition-transform transform ${
-                  dropdownOpen ? "rotate-180" : ""
-                }`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M19 9l-7 7-7-7"
-                ></path>
-              </svg>
-            </button>
-          </div>
-          {dropdownOpen && (
-            <div className="absolute z-10 mt-1 w-auto bg-white shadow-lg rounded-md">
-              {options.map((option, index) => (
-                <div
-                  key={option.value}
-                  className={`px-4 py-2 cursor-pointer transition-colors whitespace-nowrap${
-                    index === activeIndex ? "bg-gray-200" : ""
-                  } hover:bg-gray-100`}
-                  onClick={() => handleOptionClick(index)}
-                >
-                  {option.label}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <DropdownMenuBus />
         <SearchBusModal isOpen={isSearchModalOpen} onClose={closeSearchModal} />
-        <div className="flex items-center justify-center bg-gray-100">
-          <div className="relative w-full max-w-md">
-            <button
-              onClick={openSearchModal}
-              type="text"
-              className="w-full py-[2px] pl-10 pr-10 text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:border-transparent"
-              value={query}
-              // onClick={() => toggleSearchPopup(true)}
-            >
-              Search...
-            </button>
-            <svg
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 cursor-pointer"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-              // onClick={() => toggleSearchPopup(true)}
-            >
-              <circle cx="11" cy="11" r="8" stroke-width="2" fill="none" />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1116.65 16.65L21 21z"
-              ></path>
-            </svg>
-          </div>
+        <div className="flex items-center justify-center">
+          <SearchButtonBus fn={closeSearchModal} />
         </div>
       </div>
-
-      <BusListComponent
-        list={buses}
-        onDelete={handleDelete}
-        onEdit={handleEdit}
-      />
+      {isLoading && <Spinner />}
+      {isError && (
+        <p className="text-gray-700 dark:text-gray-300 text-center my-4">
+          {error.message}
+        </p>
+      )}
+      {buses?.length > 0 && (
+        <div>
+          <BusListComponent list={buses} setb={setBuses} />
+          {/* Ensure BusListComponent correctly uses the buses prop */}
+          <ReactPaginate
+            breakLabel="..."
+            nextLabel="next >"
+            onPageChange={handlePageClick}
+            pageRangeDisplayed={5}
+            pageCount={totalPage}
+            previousLabel="< previous"
+            renderOnZeroPageCount={null}
+            containerClassName="flex justify-end items-center gap-4 py-4"
+            pageClassName="page-item"
+            pageLinkClassName="page-link text-gray-700 dark:text-gray-300 px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-800"
+            previousClassName={`page-item ${
+              currentPage === 1 ? "pointer-events-none opacity-50" : ""
+            }`}
+            previousLinkClassName="page-link text-gray-700 dark:text-gray-300 px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-800"
+            nextClassName={`page-item ${
+              currentPage === totalPage
+                ? "pointer-events-none opacity-50"
+                : ""
+            }`}
+            nextLinkClassName="page-link text-gray-700 dark:text-gray-300 px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-800"
+            breakClassName="page-item"
+            breakLinkClassName="page-link text-gray-700 dark:text-gray-300 px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-800"
+            activeClassName="active"
+            activeLinkClassName="text-white bg-lime-600 dark:bg-lime-600 border border-lime-600 dark:border-lime-600"
+          />
+        </div>
+      )}
     </div>
   );
 };

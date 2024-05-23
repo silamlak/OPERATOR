@@ -1,5 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { HiMenuAlt1 } from "react-icons/hi";
+import { FaBusAlt, FaRoute } from "react-icons/fa";
+import { FaBusSimple } from "react-icons/fa6";
+import { MdPlaylistAddCircle } from "react-icons/md";
+import { CiBoxList } from "react-icons/ci";
+import { MdArrowForwardIos, MdArrowBackIosNew } from "react-icons/md";
 import {
   Sidebar,
   Menu,
@@ -8,6 +13,8 @@ import {
   menuClasses,
 } from "react-pro-sidebar";
 import { AiOutlineBarChart } from "react-icons/ai"; // Import icons from react-icons
+import Switcher from "./Switcher";
+import useDarkSide from "../theme";
 
 const themes = {
   light: {
@@ -59,95 +66,64 @@ const SideBar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [toggled, setToggled] = useState(false);
   const [broken, setBroken] = useState(false);
-  const [rtl, setRtl] = useState(false);
   const [hasImage, setHasImage] = useState(false);
   const [theme, setTheme] = useState("light");
 
-  // handle on RTL change event
-  const handleRTLChange = (e) => {
-    setRtl(e.target.checked);
-  };
-
-  // handle on theme change event
-  const handleThemeChange = (e) => {
-    setTheme(e.target.checked ? "dark" : "light");
-  };
-
-  // handle on image change event
-  const handleImageChange = (e) => {
-    setHasImage(e.target.checked);
-  };
-
   const menuItemStyles = {
-    root: {
-      fontSize: "15px",
-      fontWeight: 400,
-    },
-    icon: {
-      color: themes[theme].menu.icon,
-      [`&.${menuClasses.disabled}`]: {
-        color: themes[theme].menu.disabled.color,
-      },
-    },
-    SubMenuExpandIcon: {
-      color: "#b6b7b9",
-    },
-    subMenuContent: ({ level }) => ({
-      backgroundColor:
-        level === 0
-          ? hexToRgba(
-              themes[theme].menu.menuContent,
-              hasImage && !collapsed ? 0.4 : 1
-            )
-          : "transparent",
-    }),
     button: {
-      [`&.${menuClasses.disabled}`]: {
-        color: themes[theme].menu.disabled.color,
-      },
       "&:hover": {
-        backgroundColor: hexToRgba(
-          themes[theme].menu.hover.backgroundColor,
-          hasImage ? 0.8 : 1
-        ),
-        color: themes[theme].menu.hover.color,
+        backgroundColor: "inherit",
       },
     },
-    label: ({ open }) => ({
-      fontWeight: open ? 600 : undefined,
-    }),
   };
 
   return (
     <>
-      <div
-        className="sticky top-0 h-screen overflow-y-auto"
-        style={{
-          direction: rtl ? "rtl" : "ltr",
-        }}
-      >
+      <div className="sticky top-0 h-screen overflow-y-auto z-50 border-none">
         <Sidebar
           collapsed={collapsed}
           toggled={toggled}
           onBackdropClick={() => setToggled(false)}
           onBreakPoint={setBroken}
-          // image="https://user-images.githubusercontent.com/25878302/144499035-2911184c-76d3-4611-86e7-bc4e8ff84ff5.jpg"
-          rtl={rtl}
           breakPoint="1056px"
+          backgroundColor={hexToRgba(themes[theme].sidebar.backgroundColor)}
+          className="hover:bg-white dark:hover:bg-slate-950 h-screen dark:!border-r-gray-600 !border-r-gray-200"
+          menuItemStyles={menuItemStyles}
         >
           <div
             style={{
-              display: "flex",
-              flexDirection: "column",
-              height: "100%",
               overflowY: "initial",
             }}
+            className="flex flex-col h-full bg-white dark:bg-slate-950 relative"
           >
-            <div rtl={rtl} style={{ marginBottom: "24px", marginTop: "16px" }}>
-              Pro Slider
+            {/* first header*/}
+
+            <div className="my-4 p-1 flex items-center justify-start gap-2">
+              <span className="text-3xl text-lime-500">
+                <FaBusAlt />
+              </span>
+              <p
+                style={{ opacity: collapsed ? 0 : 1, letterSpacing: "0.5px" }}
+                className=" text-gray-900 dark:text-white font-bold text-xl"
+              >
+                HABESHA BUS
+              </p>
+              <button
+                onClick={() => setCollapsed(!collapsed)}
+                className="p-2 shadow-xl bg-white dark:bg-slate-950 rounded-full hover:shadow-none absolute top-0 right-[-9px]"
+              >
+                <span className="text-sm text-gray-900 dark:text-gray-100">
+                  {collapsed ? <MdArrowForwardIos /> : <MdArrowBackIosNew />}
+                </span>
+              </button>
             </div>
-            <div style={{ marginBottom: "2px" }}>
-              <div style={{ padding: "0 24px", marginBottom: "8px" }}>
+
+            {/* first nav list*/}
+
+            <div className="bg-white dark:bg-slate-950 mb-[2px]">
+              {/* first nav header*/}
+
+              <div className="px-6 mb-2 bg-white dark:bg-slate-950 text-gray-700 dark:text-gray-300">
                 <h2
                   style={{
                     opacity: collapsed ? 0 : 0.7,
@@ -157,50 +133,102 @@ const SideBar = () => {
                   General
                 </h2>
               </div>
-              <Menu menuItemStyles={menuItemStyles}>
+
+              {/* first menu */}
+
+              <Menu
+                menuItemStyles={menuItemStyles}
+                className="dark:bg-slate-950 bg-white text-gray-900 dark:text-gray-100"
+              >
                 <SubMenu
-                  label="Charts"
-                  icon={<AiOutlineBarChart />}
-                  suffix={<p>6</p>}
+                  label="Bus"
+                  icon={<FaBusSimple className="text-lime-600 text-lg" />}
+                  suffix={<p></p>}
+                  className="hover:bg-gray-100 dark:hover:bg-gray-800 bg-white dark:bg-slate-950"
                 >
-                  <MenuItem> Pie charts</MenuItem>
-                  <MenuItem> Line charts</MenuItem>
-                  <MenuItem> Bar charts</MenuItem>
+                  <MenuItem
+                    icon={
+                      <MdPlaylistAddCircle className="text-lime-600 text-2xl" />
+                    }
+                    className="hover:bg-gray-100 dark:hover:bg-gray-800 bg-white dark:bg-slate-950"
+                  >
+                    Add Bus
+                  </MenuItem>
+                  <MenuItem
+                    icon={<CiBoxList className="text-lime-600 text-2xl" />}
+                    className="hover:bg-gray-100 dark:hover:bg-gray-800 bg-white dark:bg-slate-950"
+                  >
+                    Bus List
+                  </MenuItem>
                 </SubMenu>
-                <SubMenu label="Maps" icon={<AiOutlineBarChart />}>
-                  <MenuItem> Google maps</MenuItem>
-                  <MenuItem> Open street maps</MenuItem>
-                </SubMenu>
-                <SubMenu label="Theme" icon={<AiOutlineBarChart />}>
-                  <MenuItem> Dark</MenuItem>
-                  <MenuItem> Light</MenuItem>
-                </SubMenu>
-                <SubMenu label="Components" icon={<AiOutlineBarChart />}>
-                  <MenuItem> Grid</MenuItem>
-                  <MenuItem> Layout</MenuItem>
-                  <SubMenu label="Forms">
-                    <MenuItem> Input</MenuItem>
-                    <MenuItem> Select</MenuItem>
-                    <SubMenu label="More">
-                      <MenuItem> CheckBox</MenuItem>
-                      <MenuItem> Radio</MenuItem>
+
+                <SubMenu
+                  className="hover:bg-gray-100 dark:hover:bg-gray-800 bg-white dark:bg-slate-950"
+                  label="Components"
+                  icon={<AiOutlineBarChart />}
+                >
+                  <MenuItem className="hover:bg-gray-100 dark:hover:bg-gray-800 bg-white dark:bg-slate-950">
+                    {" "}
+                    Grid
+                  </MenuItem>
+                  <MenuItem className="hover:bg-gray-100 dark:hover:bg-gray-800 bg-white dark:bg-slate-950">
+                    {" "}
+                    Layout
+                  </MenuItem>
+                  <SubMenu
+                    className="hover:bg-gray-100 dark:hover:bg-gray-800 bg-white dark:bg-slate-950"
+                    label="Forms"
+                  >
+                    <MenuItem className="hover:bg-gray-100 dark:hover:bg-gray-800 bg-white dark:bg-slate-950">
+                      {" "}
+                      Input
+                    </MenuItem>
+                    <MenuItem className="hover:bg-gray-100 dark:hover:bg-gray-800 bg-white dark:bg-slate-950">
+                      {" "}
+                      Select
+                    </MenuItem>
+                    <SubMenu
+                      className="hover:bg-gray-100 dark:hover:bg-gray-800 bg-white dark:bg-slate-950"
+                      label="More"
+                    >
+                      <MenuItem className="hover:bg-gray-100 dark:hover:bg-gray-800 bg-white dark:bg-slate-950">
+                        {" "}
+                        CheckBox
+                      </MenuItem>
+                      <MenuItem className="hover:bg-gray-100 dark:hover:bg-gray-800 bg-white dark:bg-slate-950">
+                        {" "}
+                        Radio
+                      </MenuItem>
                     </SubMenu>
                   </SubMenu>
                 </SubMenu>
-                <SubMenu label="E-commerce" icon={<AiOutlineBarChart />}>
-                  <MenuItem> Product</MenuItem>
-                  <MenuItem> Orders</MenuItem>
-                  <MenuItem> Credit card</MenuItem>
+
+                <SubMenu
+                  label="Route"
+                  icon={<FaRoute className="text-lime-600 text-lg" />}
+                  suffix={<p></p>}
+                  className="hover:bg-gray-100 dark:hover:bg-gray-800 bg-white dark:bg-slate-950"
+                >
+                  <MenuItem
+                    icon={
+                      <MdPlaylistAddCircle className="text-lime-600 text-2xl" />
+                    }
+                    className="hover:bg-gray-100 dark:hover:bg-gray-800 bg-white dark:bg-slate-950"
+                  >
+                    Add Route
+                  </MenuItem>
+                  <MenuItem
+                    icon={<CiBoxList className="text-lime-600 text-2xl" />}
+                    className="hover:bg-gray-100 dark:hover:bg-gray-800 bg-white dark:bg-slate-950"
+                  >
+                    Route List
+                  </MenuItem>
                 </SubMenu>
               </Menu>
 
-              <div
-                style={{
-                  padding: "0 24px",
-                  marginBottom: "8px",
-                  marginTop: "32px",
-                }}
-              >
+              {/* second nav header */}
+
+              <div className="px-6 pb-2 mt-8 bg-white dark:bg-slate-950 text-gray-700 dark:text-gray-300">
                 <h2
                   style={{
                     opacity: collapsed ? 0 : 0.7,
@@ -211,21 +239,34 @@ const SideBar = () => {
                 </h2>
               </div>
 
-              <Menu menuItemStyles={menuItemStyles}>
-                <MenuItem icon={<AiOutlineBarChart />} suffix={<p>New</p>}>
+              {/* second menu */}
+
+              <Menu
+                menuItemStyles={menuItemStyles}
+                className="dark:bg-slate-950 bg-white text-gray-900 dark:text-gray-100"
+              >
+                <MenuItem
+                  icon={<AiOutlineBarChart />}
+                  suffix={
+                    <p className="text-gray-500 dark:text-gray-400">New</p>
+                  }
+                  className="hover:bg-gray-100 dark:hover:bg-gray-800"
+                >
                   Calendar
                 </MenuItem>
-                <MenuItem icon={<AiOutlineBarChart />}>Documentation</MenuItem>
-                <MenuItem>Examples</MenuItem>
+                <MenuItem
+                  icon={<Switcher />}
+                  className="hover:bg-gray-100 dark:hover:bg-gray-800"
+                >
+                  Theme
+                </MenuItem>
+                <MenuItem className="hover:bg-gray-100 dark:hover:bg-gray-800">
+                  Examples
+                </MenuItem>
               </Menu>
             </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                paddingBottom: "20px",
-              }}
-            >
+
+            <div className="flex justify-center pb-4 bg-white dark:bg-slate-950">
               {collapsed ? (
                 <a
                   // href={codeUrl}
@@ -259,7 +300,8 @@ const SideBar = () => {
             </div>
           </div>
         </Sidebar>
-        <div className="my-2 mx-6 fixed w-full block">
+
+        <div className="my-2 mx-6 fixed text-gray-900 dark:text-gray-100 w-full block">
           {broken && (
             <button className="sb-button" onClick={() => setToggled(!toggled)}>
               <HiMenuAlt1 />
